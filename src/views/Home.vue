@@ -1,11 +1,13 @@
 <template>
   <div class="home hex-grid" id="hex-grid">
     <section class="hex-grid__list">
-      <div v-for="(col, x) in tileArr" :key="x" class="hex-grid__item">
+      <div v-for="(col, x) in board.tiles" :key="x" class="hex-grid__item">
         <div v-for="(row, y) in col" :key="x-y" class="hex-grid__item">
-          <div @click="tileClick(x, y)" 
+          <!--<div @click="tileClick(x, y)" -->
+          <div @click="checkDistance(board.tiles[x][y])" 
                class="hex-grid__content"
-               :class="[ tileArr[x][y].type ]">
+               :class="[ board.tiles[x][y].type ]">
+               {{ x }},{{ y }}
           </div>
         </div>
       </div>
@@ -19,6 +21,7 @@
 function getRandom(max) {
   return Math.floor(Math.random() * Math.floor(max));
 }
+
 class Zone {
   constructor(base) {
     this.base = base;
@@ -58,28 +61,57 @@ class Tile {
   }
 }
 
+class Board {
+  constructor(width, height) {
+    this.w = width;
+    this.h = height;
+    this.tiles = [];
+    this.generate();
+  }
+
+  generate() {
+    this.tiles = [];
+    for (let x=0; x<this.w; x++) {
+      this.tiles.push([]);
+      for (let y=0; y<this.h; y++) {
+        this.tiles[x].push(new Tile(x, y, getRandom(2), getRandom(6)));
+      }
+    }
+  }
+
+  distance(from, to) {
+    // TODO: Nope this doesnt wirk for thus use case.
+    return Math.sqrt(Math.pow((to.x - from.x), 2) + Math.pow((to.y - from.x), 2));
+  }
+}
+ 
+
 export default {
   name: 'Home',
   data() {
     return {
-      selected: Object,
-      colAmount: 4,
-      rowAmount: 10,
-      tileArr: []
+      board: Object,
+      cols: 5,
+      rows: 5,
+      selected: false,
     }
   },
   methods: {
     tileClick(col, row) {
       alert("test!"+col+row);
+    },
+    checkDistance(tile) {
+      if (!this.selected) {
+        this.selected = tile;
+      } else {
+        alert(this.board.distance(this.selected, tile));
+        this.selected = false;
+      }
     }
   },
   created() {
-    for (let x=0; x<this.colAmount; x++) {
-      this.tileArr.push([]);
-      for (let y=0; y<this.rowAmount; y++) {
-        this.tileArr[x].push(new Tile(x, y, "1", getRandom(6)));
-      }
-    }
+    this.board = new Board(this.cols, this.rows);
+    this.board.generate();
   }
 }
 </script>
@@ -95,6 +127,10 @@ export default {
 
 .grass {
   background-color: green;
+}
+
+.water {
+  background-color: blue;
 }
 
 .empty {
@@ -113,7 +149,7 @@ $block: '.hex-grid';
         }
     }
 
-    @for $i from 1 through 20 {
+    @for $i from 1 through 4 {
         &:nth-of-type(n + #{$i * $amount + 1}) {
             --counter: #{$i + 1};
         }
@@ -123,7 +159,7 @@ $block: '.hex-grid';
 #{$block} {
 
     &__list {
-      --amount: 5;
+      --amount: 25;
       position: relative;
       padding: 0;
       margin: 0;
@@ -177,12 +213,12 @@ $block: '.hex-grid';
 @media screen and (min-width: 1120px) and (max-width: 1439px) {
 	#{$block} {
 		&__list {
-      --amount: 4;
+      --amount: 5;
 			--counter: 1;
 		}
 
 		&__item {
-			@include grid-item(4);
+			@include grid-item(5);
 		}
 	}
 }
@@ -190,13 +226,13 @@ $block: '.hex-grid';
 @media screen and (min-width: 840px) and (max-width: 1119px) {
 	#{$block} {
 		&__list {
-      --amount: 4;
-			--counter: 4;
+      --amount: 5;
+			--counter: 1;
 			grid-gap: 1.5rem 3rem;
 		}
 
 		&__item {
-			@include grid-item(4);
+			@include grid-item(5);
 		}
 	}
 }
@@ -218,13 +254,13 @@ $block: '.hex-grid';
 @media screen and (max-width: 479px) {
 	#{$block} {
 		&__list {
-      --amount: 4;
+      --amount: 5;
 			--counter: 1;
 			grid-gap: 0;
 		}
 
 		&__item {
-			@include grid-item(4);
+			@include grid-item(5);
 		}
 	}
 }
