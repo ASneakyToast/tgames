@@ -2,6 +2,7 @@ import Vue from 'vue'
 import VueRouter from 'vue-router'
 import Home from '../views/Home.vue'
 import Square from '../views/Square.vue'
+import Minesweeper from '../views/Minesweeper.vue'
 
 Vue.use(VueRouter)
 
@@ -15,6 +16,11 @@ const routes = [
     path: '/Square',
     name: 'Square',
     component: Square
+  },
+  {
+    path: '/Minesweeper',
+    name: 'Minesweeper',
+    component: Minesweeper
   },
   {
     path: '/about',
